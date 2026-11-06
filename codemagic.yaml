@@ -4,10 +4,21 @@ workflows:
     name: Radhika Cab APK
     max_build_duration: 120
     instance_type: linux_x2
+
     scripts:
-      - name: Build Android APK
+      - name: Extract Android Project
         script: |
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          mkdir -p project
+          ZIP_FILE=$(find . -maxdepth 1 -name '*.zip' | head -n 1)
+          unzip -q "$ZIP_FILE" -d project
+          cd project/RadhikaCabGPS
+
+      - name: Install Gradle and Build APK
+        script: |
+          curl -L -o gradle.zip https://services.gradle.org/distributions/gradle-8.7-bin.zip
+          unzip -q gradle.zip
+          cd project/RadhikaCabGPS
+          ./../gradle-8.7/bin/gradle assembleDebug
+
     artifacts:
-      - app/build/outputs/apk/debug/*.apk
+      - project/RadhikaCabGPS/app/build/outputs/apk/debug/*.apk
